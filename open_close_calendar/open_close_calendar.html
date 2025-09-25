@@ -120,7 +120,7 @@
 
     /* 開寮日 */
     .open {
-      background-color: rgba(165, 214, 167, 0.8);
+      background-color: rgba(165, 214, 167, 1.0);
     }
 
     .open.weekday .date-number,
@@ -138,7 +138,7 @@
 
     /* 閉寮日 */
     .closed {
-      background-color: rgba(239, 154, 154, 0.8);
+      background-color: rgba(239, 154, 154, 1.0);
     }
 
     .closed.weekday .date-number,
@@ -156,6 +156,37 @@
 
     .empty-cell {
       background-color: transparent;
+      border-color: transparent;
+    }
+
+    .other-month {
+      background-color: rgba(0, 0, 0, 0.2);
+    }
+
+    .other-month .date-number {
+      font-size: 14px;
+      color: #ccc;
+      font-weight: normal;
+    }
+
+    .other-month.open {
+      background-color: rgba(165, 214, 167, 0.8);
+    }
+
+    .other-month.closed {
+      background-color: rgba(239, 154, 154, 0.7);
+    }
+
+    .other-month.sunday .date-number {
+      color: #E53935;
+    }
+
+    .other-month.saturday .date-number {
+      color: #1E88E5;
+    }
+
+    .other-month.weekday .date-number {
+      color: #333;
     }
 
     .legend {
@@ -177,7 +208,7 @@
       width: 14px;
       height: 14px;
       margin-right: 5px;
-      border: 1px solid #ccc;
+      border: 1px solid #cfab71;
       border-radius: 3px;
     }
   </style>
@@ -217,16 +248,18 @@
     document.addEventListener('DOMContentLoaded', function () {
       const params = new URLSearchParams(window.location.search);
       const monthParam = params.get('month');
+      let allMonthsData = [];
 
       fetch('assets/database/2025.json')
         .then(response => response.json())
         .then(data => {
+          allMonthsData = data.list;
           let monthData;
           if (monthParam) {
-            monthData = data.list.find(item => item.calendar_info.month == parseInt(monthParam));
-          } else if (data.list.length > 0) {
+            monthData = allMonthsData.find(item => item.calendar_info.month == parseInt(monthParam));
+          } else if (allMonthsData.length > 0) {
             // パラメータがない場合は最初のデータを表示
-            monthData = data.list[0];
+            monthData = allMonthsData[0];
           }
 
           if (monthData) {
@@ -251,20 +284,74 @@
 
         const firstDay = new Date(year, month - 1, 1).getDay();
         const daysInMonth = new Date(year, month, 0).getDate();
+        const prevMonthDate = new Date(year, month - 1, 0);
+        const daysInPrevMonth = prevMonthDate.getDate();
+        const prevMonthValue = prevMonthDate.getMonth() + 1;
+        const prevMonthYear = prevMonthDate.getFullYear();
+        const nextMonthDateObj = new Date(year, month, 1);
+        const nextMonthValue = nextMonthDateObj.getMonth() + 1;
+        const nextMonthYear = nextMonthDateObj.getFullYear();
+
+        const prevMonthData = allMonthsData.find(d => d.calendar_info.year === prevMonthYear && d.calendar_info.month === prevMonthValue);
+        const nextMonthData = allMonthsData.find(d => d.calendar_info.year === nextMonthYear && d.calendar_info.month === nextMonthValue);
 
         let date = 1;
+        let nextMonthDate = 1;
         for (let i = 0; i < 6; i++) {
           const row = document.createElement('tr');
           for (let j = 0; j < 7; j++) {
             if (i === 0 && j < firstDay) {
+              // 前月の日付
               const cell = document.createElement('td');
-              cell.classList.add('empty-cell');
+              cell.classList.add('other-month');
+              const dayCell = document.createElement('div');
+              dayCell.classList.add('day-cell');
+              const dateNumber = document.createElement('span');
+              dateNumber.classList.add('date-number');
+              const prevDate = daysInPrevMonth - firstDay + j + 1;
+              dateNumber.textContent = `${prevMonthValue}/${prevDate}`;
+              dayCell.appendChild(dateNumber);
+              cell.appendChild(dayCell);
+
+              if (prevMonthData && prevMonthData.schedule.close_info.includes(prevDate)) {
+                cell.classList.add('closed');
+              } else {
+                cell.classList.add('open');
+              }
+
+              const dayOfWeek = j;
+              if (dayOfWeek === 0) cell.classList.add('sunday');
+              else if (dayOfWeek === 6) cell.classList.add('saturday');
+              else cell.classList.add('weekday');
+
               row.appendChild(cell);
             } else if (date > daysInMonth) {
+              // 次月の日付
               const cell = document.createElement('td');
-              cell.classList.add('empty-cell');
+              cell.classList.add('other-month');
+              const dayCell = document.createElement('div');
+              dayCell.classList.add('day-cell');
+              const dateNumber = document.createElement('span');
+              dateNumber.classList.add('date-number');
+              dateNumber.textContent = `${nextMonthValue}/${nextMonthDate}`;
+              dayCell.appendChild(dateNumber);
+              cell.appendChild(dayCell);
+
+              if (nextMonthData && nextMonthData.schedule.close_info.includes(nextMonthDate)) {
+                cell.classList.add('closed');
+              } else {
+                cell.classList.add('open');
+              }
+
+              const dayOfWeek = j;
+              if (dayOfWeek === 0) cell.classList.add('sunday');
+              else if (dayOfWeek === 6) cell.classList.add('saturday');
+              else cell.classList.add('weekday');
+
               row.appendChild(cell);
+              nextMonthDate++;
             } else {
+              // 今月の日付
               const cell = document.createElement('td');
               const dayCell = document.createElement('div');
               dayCell.classList.add('day-cell');
