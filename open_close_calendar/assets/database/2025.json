@@ -1,0 +1,71 @@
+{
+    "list": [
+        {
+            "calendar_info": {
+                "year": 2025,
+                "month": 9
+            },
+            "schedule": {
+                "close_info": [
+                    3,
+                    4,
+                    10,
+                    11,
+                    17,
+                    18,
+                    24,
+                    25,
+                    30
+                ]
+            }
+        },
+        {
+            "calendar_info": {
+                "year": 2025,
+                "month": 10
+            },
+            "schedule": {
+                "close_info": [
+                    1,
+                    2,
+                    3,
+                    4,
+                    8,
+                    9,
+                    15,
+                    16,
+                    22,
+                    23,
+                    29,
+                    30
+                ],
+                "events": [
+                    {
+                        "day": 5,
+                        "title": "test試験試験",
+                        "description": "",
+                        "time": ""
+                    }
+                ]
+            }
+        },
+        {
+            "calendar_info": {
+                "year": 2025,
+                "month": 11
+            },
+            "schedule": {
+                "close_info": [
+                    5,
+                    6,
+                    12,
+                    13,
+                    19,
+                    20,
+                    26,
+                    27
+                ]
+            }
+        }
+    ]
+}
