@@ -19,4 +19,11 @@
 - [x] 現状のコードを仕様書にまとめる
 - [x] カレンダーの背景をassets/images/background.pngに変更
 - [X] カレンダーの情報のjsonの枠組みを設計
-- [ ] カレンダーの情報を2510.jsonに変更
+- [x] カレンダーの情報を2025.jsonに変更
+
+htmlファイルを直接開くと、JavaScriptのCORSポリシーにより、ローカルのJSONファイルを読み込むことができない。ローカルサーバーを立ててアクセスする必要あり。
+
+```
+python -m http.server
+http://localhost:8000/open_close_calendar.html?month=10
+```

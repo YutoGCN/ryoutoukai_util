@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>2025年6月 桐陰寮 カレンダー</title>
+  <title>桐陰寮 カレンダー</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@500;700&display=swap" rel="stylesheet">
@@ -171,7 +171,7 @@
 <body>
   <div class="calendar-container">
     <div class="calendar-content">
-      <div class="calendar-title">2025年6月 桐陰寮 カレンダー</div>
+      <div id="calendar-title" class="calendar-title"></div>
       <table>
         <thead>
           <tr>
@@ -184,112 +184,7 @@
             <th style="color: #BBDEFB;">土</th>
           </tr>
         </thead>
-        <tbody>
-          <tr>
-            <td class="open sunday">
-              <div class="day-cell"><span class="date-number">1</span></div>
-            </td>
-            <td class="open weekday">
-              <div class="day-cell"><span class="date-number">2</span></div>
-            </td>
-            <td class="closed weekday">
-              <div class="day-cell"><span class="date-number">3</span></div>
-            </td>
-            <td class="closed weekday">
-              <div class="day-cell"><span class="date-number">4</span></div>
-            </td>
-            <td class="closed weekday">
-              <div class="day-cell"><span class="date-number">5</span></div>
-            </td>
-            <td class="open weekday">
-              <div class="day-cell"><span class="date-number">6</span></div>
-            </td>
-            <td class="open saturday">
-              <div class="day-cell"><span class="date-number">7</span></div>
-            </td>
-          </tr>
-          <tr>
-            <td class="open sunday">
-              <div class="day-cell"><span class="date-number">8</span></div>
-            </td>
-            <td class="open weekday">
-              <div class="day-cell"><span class="date-number">9</span></div>
-            </td>
-            <td class="closed weekday">
-              <div class="day-cell"><span class="date-number">10</span></div>
-            </td>
-            <td class="closed weekday">
-              <div class="day-cell"><span class="date-number">11</span></div>
-            </td>
-            <td class="closed weekday">
-              <div class="day-cell"><span class="date-number">12</span></div>
-            </td>
-            <td class="open weekday">
-              <div class="day-cell"><span class="date-number">13</span></div>
-            </td>
-            <td class="open saturday">
-              <div class="day-cell"><span class="date-number">14</span></div>
-            </td>
-          </tr>
-          <tr>
-            <td class="open sunday">
-              <div class="day-cell"><span class="date-number">15</span></div>
-            </td>
-            <td class="open weekday">
-              <div class="day-cell"><span class="date-number">16</span></div>
-            </td>
-            <td class="closed weekday">
-              <div class="day-cell"><span class="date-number">17</span></div>
-            </td>
-            <td class="closed weekday">
-              <div class="day-cell"><span class="date-number">18</span></div>
-            </td>
-            <td class="closed weekday">
-              <div class="day-cell"><span class="date-number">19</span></div>
-            </td>
-            <td class="closed weekday">
-              <div class="day-cell"><span class="date-number">20</span></div>
-            </td>
-            <td class="closed saturday">
-              <div class="day-cell"><span class="date-number">21</span></div>
-            </td>
-          </tr>
-          <tr>
-            <td class="open sunday">
-              <div class="day-cell"><span class="date-number">22</span></div>
-            </td>
-            <td class="open weekday">
-              <div class="day-cell"><span class="date-number">23</span></div>
-            </td>
-            <td class="closed weekday">
-              <div class="day-cell"><span class="date-number">24</span></div>
-            </td>
-            <td class="closed weekday">
-              <div class="day-cell"><span class="date-number">25</span></div>
-            </td>
-            <td class="closed weekday">
-              <div class="day-cell"><span class="date-number">26</span></div>
-            </td>
-            <td class="open weekday">
-              <div class="day-cell"><span class="date-number">27</span></div>
-            </td>
-            <td class="open saturday">
-              <div class="day-cell"><span class="date-number">28</span></div>
-            </td>
-          </tr>
-          <tr>
-            <td class="open sunday">
-              <div class="day-cell"><span class="date-number">29</span></div>
-            </td>
-            <td class="open weekday">
-              <div class="day-cell"><span class="date-number">30</span></div>
-            </td>
-            <td class="empty-cell"></td>
-            <td class="empty-cell"></td>
-            <td class="empty-cell"></td>
-            <td class="empty-cell"></td>
-            <td class="empty-cell"></td>
-          </tr>
+        <tbody id="calendar-body">
         </tbody>
       </table>
       <div class="legend">
@@ -302,6 +197,94 @@
       </div>
     </div>
   </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const params = new URLSearchParams(window.location.search);
+      const monthParam = params.get('month');
+
+      fetch('assets/database/2025.json')
+        .then(response => response.json())
+        .then(data => {
+          let monthData;
+          if (monthParam) {
+            monthData = data.list.find(item => item.calendar_info.month == parseInt(monthParam));
+          } else if (data.list.length > 0) {
+            // パラメータがない場合は最初のデータを表示
+            monthData = data.list[0];
+          }
+
+          if (monthData) {
+            generateCalendar(monthData);
+          } else {
+            document.getElementById('calendar-title').textContent = '指定された月のデータが見つかりません。';
+          }
+        });
+
+      function generateCalendar(data) {
+        const year = data.calendar_info.year;
+        const month = data.calendar_info.month;
+        const closeInfo = data.schedule.close_info || [];
+
+        const titleText = `${year}年${month}月 桐陰寮 カレンダー`;
+        document.title = titleText;
+        document.getElementById('calendar-title').textContent = titleText;
+
+        const calendarBody = document.getElementById('calendar-body');
+        calendarBody.innerHTML = '';
+
+        const firstDay = new Date(year, month - 1, 1).getDay();
+        const daysInMonth = new Date(year, month, 0).getDate();
+
+        let date = 1;
+        for (let i = 0; i < 6; i++) {
+          const row = document.createElement('tr');
+          for (let j = 0; j < 7; j++) {
+            if (i === 0 && j < firstDay) {
+              const cell = document.createElement('td');
+              cell.classList.add('empty-cell');
+              row.appendChild(cell);
+            } else if (date > daysInMonth) {
+              const cell = document.createElement('td');
+              cell.classList.add('empty-cell');
+              row.appendChild(cell);
+            } else {
+              const cell = document.createElement('td');
+              const dayCell = document.createElement('div');
+              dayCell.classList.add('day-cell');
+              const dateNumber = document.createElement('span');
+              dateNumber.classList.add('date-number');
+              dateNumber.textContent = date;
+              dayCell.appendChild(dateNumber);
+              cell.appendChild(dayCell);
+
+              const currentDate = new Date(year, month - 1, date);
+              const dayOfWeek = currentDate.getDay();
+
+              if (closeInfo.includes(date)) {
+                cell.classList.add('closed');
+              } else {
+                cell.classList.add('open');
+              }
+
+              if (dayOfWeek === 0) {
+                cell.classList.add('sunday');
+              } else if (dayOfWeek === 6) {
+                cell.classList.add('saturday');
+              } else {
+                cell.classList.add('weekday');
+              }
+
+              row.appendChild(cell);
+              date++;
+            }
+          }
+          calendarBody.appendChild(row);
+          if (date > daysInMonth) break;
+        }
+      }
+    });
+  </script>
 </body>
 
 </html>
