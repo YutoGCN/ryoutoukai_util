@@ -42,9 +42,7 @@
                 "events": [
                     {
                         "day": 5,
-                        "title": "test試験試験",
-                        "description": "",
-                        "time": ""
+                        "title": "test"
                     }
                 ]
             }

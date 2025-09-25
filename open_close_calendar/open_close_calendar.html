@@ -71,11 +71,26 @@
 
     .day-cell {
       display: flex;
+      flex-direction: column;
+      /* 縦並びに変更 */
       justify-content: center;
       align-items: center;
       width: 100%;
       aspect-ratio: 1 / 1;
       box-sizing: border-box;
+      /* padding-top: 2px; */
+      /* 少し上に余白 */
+    }
+
+    .event-title {
+      font-size: 12px;
+      /* 小さいフォントサイズ */
+      margin-top: 1px;
+      /* 日付との間隔 */
+      color: #000000;
+      /* 白文字 */
+      font-weight: normal;
+      line-height: 1;
     }
 
     .date-number {
@@ -225,6 +240,7 @@
         const year = data.calendar_info.year;
         const month = data.calendar_info.month;
         const closeInfo = data.schedule.close_info || [];
+        const events = data.schedule.events || []; // イベント情報を取得
 
         const titleText = `${year}年${month}月 桐陰寮 カレンダー`;
         document.title = titleText;
@@ -256,6 +272,16 @@
               dateNumber.classList.add('date-number');
               dateNumber.textContent = date;
               dayCell.appendChild(dateNumber);
+
+              // イベントの処理
+              const eventOnDay = events.find(e => e.day === date);
+              if (eventOnDay) {
+                const eventTitle = document.createElement('div');
+                eventTitle.classList.add('event-title');
+                eventTitle.textContent = eventOnDay.title;
+                dayCell.appendChild(eventTitle);
+              }
+
               cell.appendChild(dayCell);
 
               const currentDate = new Date(year, month - 1, date);
